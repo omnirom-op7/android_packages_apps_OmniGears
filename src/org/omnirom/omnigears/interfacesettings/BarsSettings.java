@@ -26,11 +26,13 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import com.android.internal.logging.nano.MetricsProto.MetricsEvent;
+import com.android.internal.util.omni.OmniUtils;
 
 import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceScreen;
 import android.support.v7.preference.PreferenceCategory;
+import android.support.v14.preference.SwitchPreference;
 
 import com.android.settings.SettingsPreferenceFragment;
 import com.android.settings.R;
@@ -58,11 +60,13 @@ public class BarsSettings extends SettingsPreferenceFragment implements
     private static final String KEY_STATUSBAR_CATEGORY = "statusbar_settings_category";
     private static final String KEY_HIDE_NOTCH = "hide_notch";
     private static final String NETWORK_TRAFFIC_ROOT = "category_network_traffic";
+    private static final String SHOW_FOURG = "show_fourg";
 
     private ListPreference mQuickPulldown;
     private AppMultiSelectListPreference mAspectRatioAppsSelect;
     private ScrollAppsViewPreference mAspectRatioApps;
     private SeekBarPreference mQsPanelAlpha;
+    private SwitchPreference mShowFourG;
 
     @Override
     public int getMetricsCategory() {
@@ -124,10 +128,27 @@ public class BarsSettings extends SettingsPreferenceFragment implements
                 TrafficStats.getTotalRxBytes() == TrafficStats.UNSUPPORTED) {
             prefScreen.removePreference(findPreference(NETWORK_TRAFFIC_ROOT));
         }
+
+        mShowFourG = (SwitchPreference) findPreference(SHOW_FOURG);
+
+        if (OmniUtils.isWifiOnly(getActivity())) {
+            final PreferenceCategory statusBarCategory =
+                (PreferenceCategory) prefScreen.findPreference(KEY_STATUSBAR_CATEGORY);
+            statusBarCategory.removePreference(mShowFourG);
+        } else {
+            mShowFourG.setChecked((Settings.System.getInt(getContentResolver(),
+                Settings.System.SHOW_FOURG, 0) == 1));
+        }
     }
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
+        if (preference == mShowFourG) {
+            boolean checked = ((SwitchPreference)preference).isChecked();
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.SHOW_FOURG, checked ? 1:0);
+            return true;
+        }
         return super.onPreferenceTreeClick(preference);
     }
 

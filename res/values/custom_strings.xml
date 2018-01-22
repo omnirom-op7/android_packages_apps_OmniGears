@@ -848,4 +848,8 @@
     <!-- Fingerprint -->
     <string name="fingerprint_settings_title">Fingerprint</string>
     <string name="fingerprint_category_custom_icon">Custom icon</string>
+
+    <!-- 4G icon -->
+    <string name="show_fourg_icon_title">4G icon on Statusbar</string>
+    <string name="show_fourg_icon_summary">On signal icon, show 4G instead of LTE</string>
 </resources>
